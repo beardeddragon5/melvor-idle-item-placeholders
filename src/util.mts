@@ -18,46 +18,26 @@ export function isEmpty(item?: Item): boolean {
   return !!item && item.isModded && item.namespace === 'item_placeholder' && item.localID.startsWith('empty');
 }
 
-function getUIBankItem(itemID: string) {
-  return document.querySelector(`bank-item-icon[data-item-id="${itemID}"]`);
-}
-
 export function refreshAllPlaceholderStyles(itemStyle: PlaceholderStyles, emptyStyle: PlaceholderStyles) {
-  for (const bankItem of game.bank.items.values()) {
-    setItemPlaceholderStyle(bankItem, itemStyle, emptyStyle);
-  }
-}
-
-export function setItemPlaceholderStyle(
-  bankItem: BankItem,
-  itemStyle: PlaceholderStyles,
-  emptyStyle: PlaceholderStyles,
-  retry: number = 0,
-) {
-  const element = getUIBankItem(bankItem.item.id);
-  if (!element && retry >= 2) {
-    console.warn('[Item Placeholder] try requesting item not found in ui:', bankItem.item.id);
-    return;
-  } else if (!element) {
-    setTimeout(setItemPlaceholderStyle, 100, bankItem, itemStyle, emptyStyle, retry + 1);
+  const element = document.getElementById('bank-container');
+  if (!element) {
+    console.warn('[Item Placeholder] no bank container found');
     return;
   }
-
   for (const style of Object.values(PlaceholderStyles)) {
     element.classList.remove(style);
+    element.classList.remove(style.replace('placeholder', 'empty'));
   }
 
-  if (isPlaceholder(bankItem)) {
-    element.classList.add(isEmpty(bankItem.item) ? emptyStyle : itemStyle);
-  }
+  element.classList.add(itemStyle, emptyStyle.replace('placeholder', 'empty'));
 }
 
-export function setItemPlaceholderStyleWithContext(ctx: ItemPlaceholderContext, bankItem: BankItem) {
+export function refreshAllPlaceholderStylesWithContext(ctx: ItemPlaceholderContext) {
   const section = ctx.settings.section('General');
   const placeholderStyle = section.get('placeholder-style');
   const emptyStyle = section.get('empty-style');
 
   if (placeholderStyle && emptyStyle) {
-    setItemPlaceholderStyle(bankItem, placeholderStyle, emptyStyle);
+    refreshAllPlaceholderStyles(placeholderStyle, emptyStyle);
   }
 }
