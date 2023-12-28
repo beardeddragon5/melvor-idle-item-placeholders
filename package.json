@@ -2,16 +2,29 @@
   "name": "item_placeholder",
   "version": "1.3.0",
   "description": "Item Placeholder for Melvor Idle",
+  "homepage": "https://mod.io/g/melvoridle/m/item-placeholder",
+  "author": "Matthias Ramsauer",
+  "license": "LGPL-3.0-or-later",
   "icon": "src/assets/icon.png",
+  "repository": {
+    "url": "https://github.com/beardeddragon5/melvor-idle-item-placeholders"
+  },
+  "bugs": {
+    "url": "https://github.com/beardeddragon5/melvor-idle-item-placeholders"
+  },
   "type": "module",
   "main": "src/setup.mjs",
   "scripts": {
     "format": "prettier --write src",
     "lint": "eslint 'src/**/*.mts'",
+    "check": "npm run lint && prettier --check src",
     "build": "npm run format && npm run lint && tsc && ./build.sh"
   },
-  "author": "Matthias Ramsauer",
-  "license": "LGPL-3.0-or-later",
+  "engines": {
+    "node": "18.12.1",
+    "npm": "9.2.0"
+  },
+  "engineStrict": true,
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^6.15.0",
     "@typescript-eslint/parser": "^6.15.0",

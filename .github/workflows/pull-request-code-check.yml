@@ -1,0 +1,41 @@
+name: Pull Request Code Check
+
+on:
+  pull_request:
+
+jobs:
+  Test:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Read node version from nvmrc
+        run: echo "nvmrc=$(cat .nvmrc)" >> $GITHUB_ENV
+
+      - name: Read wanted node versions from package.json
+        run: |
+          echo "node_version=$(jq --raw-output '.engines.node' package.json)" >> "$GITHUB_ENV"
+          echo "npm_version=$(jq --raw-output '.engines.npm' package.json)" >> "$GITHUB_ENV"
+
+      - name: Check if nvm and package.json are in sync
+        run: test "${{ env.node_version }}" == "${{ env.nvmrc }}"
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: 'package.json'
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+
+      - name: Fix npm version
+        run: npm install -g npm@${{ env.npm_version }}
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run checks
+        run: npm run check
+
+      - name: Check if buildable
+        run: npm run build --production
