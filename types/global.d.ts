@@ -19,6 +19,11 @@ declare class BankItem {
   get stackValue(): number;
 }
 
+declare class BankItemIcon extends HTMLElement {
+  setItem(bank: Bank, bankItem: BankItem): void;
+  updateQuantity(bankItem: BankItem, enableAccessibility: boolean): void;
+}
+
 declare class Item {
   get id(): string;
   get localID(): string;
@@ -101,14 +106,14 @@ declare class GameData {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-declare class MethodPatch<M extends (...args: any[]) => any> {
-  before(hook: (...args: Parameters<M>) => Parameters<M> | undefined): void;
-  after(hook: (returnValue: ReturnType<M>, ...args: Parameters<M>) => ReturnType<M>): void;
-  replace(replacement: (replacedMethod: M, ...args: Parameters<M>) => ReturnType<M>): void;
+declare class MethodPatch<C, M extends (...args: any[]) => any> {
+  before(hook: (this: C, ...args: Parameters<M>) => Parameters<M> | undefined): void;
+  after(hook: (this: C, returnValue: ReturnType<M>, ...args: Parameters<M>) => ReturnType<M>): void;
+  replace(replacement: (this: C, replacedMethod: M, ...args: Parameters<M>) => ReturnType<M>): void;
 }
 
-declare class PropertyPatch {
-  get<T>(getter: (originalGetter: () => T) => T): void;
+declare class PropertyPatch<C> {
+  get<T>(getter: (this: C, originalGetter: () => T) => T): void;
 }
 
 type SettingConfigs<K extends string, V> =
@@ -218,7 +223,7 @@ declare class Context<Settings = unknown, CharacterStorage = unknown, AccountSto
   patch<T, P extends keyof T>(
     clazz: Type<T>,
     value: P, // eslint-disable-next-line @typescript-eslint/ban-types, @typescript-eslint/no-explicit-any
-  ): T[P] extends (...args: any[]) => any ? MethodPatch<T[P]> : PropertyPatch;
+  ): T[P] extends (...args: any[]) => any ? MethodPatch<T, T[P]> : PropertyPatch<T>;
 
   characterStorage: ModStorage<CharacterStorage>;
   accountStorage: ModStorage<AccountStorage>;

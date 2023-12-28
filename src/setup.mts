@@ -8,16 +8,11 @@ export async function setup(ctx: ItemPlaceholderContext) {
   const { removeEmpty, setupEmpty } = await ctx.loadModule<typeof empty>('empty.mjs');
   const { setupUI } = await ctx.loadModule<typeof ui>('ui.mjs');
   const { setupSettings } = await ctx.loadModule<typeof settings>('settings.mjs');
-  const { isEmpty, setItemPlaceholderStyleWithContext } = await ctx.loadModule<typeof util>('util.mjs');
+  const { isEmpty } = await ctx.loadModule<typeof util>('util.mjs');
 
   await setupEmpty(ctx);
   await setupSettings(ctx);
   await setupUI(ctx);
-
-  let isUiLoaded = false;
-  ctx.onInterfaceReady(() => {
-    isUiLoaded = true;
-  });
 
   ctx.onCharacterLoaded(() => {
     // NOTE: this is for the rare case that items in a tab get duplicated.
@@ -112,10 +107,6 @@ export async function setup(ctx: ItemPlaceholderContext) {
       game.bank.reassignBankItemPositions(tab, tabPosition);
       game.bank.renderQueue.items.add(item);
       game.bank.queueQuantityUpdates(item);
-
-      if (isUiLoaded) {
-        setItemPlaceholderStyleWithContext(ctx, placeholder);
-      }
     }
   });
 
@@ -166,16 +157,11 @@ export async function setup(ctx: ItemPlaceholderContext) {
     return hasItem;
   });
 
-  ctx.patch(Bank, 'addItem').after((output: void, item: Item) => {
-    if (item) {
-      const bankItem = game.bank.items.get(item);
-      if (!bankItem) {
-        return;
-      }
+  ctx.patch(BankItemIcon, 'setItem').after(function (out, bank, bankItem) {
+    this.setAttribute('data-item-quantity', String(bankItem.quantity));
+  });
 
-      if (isUiLoaded) {
-        setItemPlaceholderStyleWithContext(ctx, bankItem);
-      }
-    }
+  ctx.patch(BankItemIcon, 'updateQuantity').after(function (out, bankItem) {
+    this.setAttribute('data-item-quantity', String(bankItem.quantity));
   });
 }

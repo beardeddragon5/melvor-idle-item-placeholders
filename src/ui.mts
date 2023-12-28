@@ -4,7 +4,7 @@ import type * as util from './util.mjs';
 
 export async function setupUI(ctx: ItemPlaceholderContext) {
   const { getNextEmpty } = await ctx.loadModule<typeof empty>('empty.mjs');
-  const { isPlaceholder, refreshAllPlaceholderStyles } = await ctx.loadModule<typeof util>('util.mjs');
+  const { isPlaceholder, refreshAllPlaceholderStylesWithContext } = await ctx.loadModule<typeof util>('util.mjs');
 
   function releaseItem(bankItem?: BankItem) {
     if (isPlaceholder(bankItem)) {
@@ -71,11 +71,6 @@ export async function setupUI(ctx: ItemPlaceholderContext) {
     ui.create(ReleaseAll(), bankOptions);
     ui.create(CreateEmpty(), bankOptions);
 
-    const placeholderStyle = ctx.settings.section('General').get('placeholder-style');
-    const emptyStyle = ctx.settings.section('General').get('empty-style');
-
-    if (placeholderStyle && emptyStyle) {
-      refreshAllPlaceholderStyles(placeholderStyle, emptyStyle);
-    }
+    refreshAllPlaceholderStylesWithContext(ctx);
   });
 }
