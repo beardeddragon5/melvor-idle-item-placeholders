@@ -1,0 +1,6 @@
+{
+  "namespace": "item_placeholder",
+  "setup": "setup.mjs",
+  "icon": "assets/icon.png",
+  "load": ["assets/placeholder.css", "assets/templates.html"]
+}

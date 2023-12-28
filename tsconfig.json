@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "module": "ESNext",
+    "lib": ["DOM", "ES2017"],
+    "target": "ESNext",
+    "allowJs": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "typeRoots": [],
+    "outDir": "dist"
+  },
+  "include": ["src/**/*", "types"],
+  "exclude": ["**/*.spec.ts"]
+}

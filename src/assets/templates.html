@@ -1,0 +1,25 @@
+<template id="release-item">
+  <div class="col-12">
+    <div class="block block-rounded-double bg-combat-inner-dark">
+      <div class="block-header block-header-default bg-dark-bank-block-header px-3 py-1">
+        <h5 class="font-size-sm font-w600 mb-0">
+          <i class="fa fa-unlock text-success"></i>
+          <span>Item Placeholder</span>
+        </h5>
+      </div>
+      <div class="row no-gutters p-2">
+        <div class="col-12 text-center">
+          <button class="btn btn-danger" @click="release">Release</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template id="release-all">
+  <button type="button" class="btn btn-danger m-1" @click="release">Release All in Tab</button>
+</template>
+
+<template id="create-empty">
+  <button type="button" class="btn btn-info m-1" @click="createEmpty">Create Empty</button>
+</template>

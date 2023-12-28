@@ -1,0 +1,33 @@
+.placeholder-none {
+  /* empty */
+}
+
+.placeholder-faded {
+  opacity: 50%;
+}
+
+.placeholder-faded-image img {
+  opacity: 50%;
+}
+
+.placeholder-border .bank-img {
+  border: 1px solid #d26a5c;
+  border-radius: 5px;
+}
+
+.placeholder-zero small {
+  background-color: #e56767 !important;
+  color: white !important;
+}
+
+.placeholder-no-number small {
+  display: none;
+}
+
+.placeholder-no-number-faded {
+  opacity: 50%;
+}
+
+.placeholder-no-number-faded small {
+  display: none;
+}
