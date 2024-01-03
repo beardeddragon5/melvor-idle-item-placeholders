@@ -1,0 +1,71 @@
+name: 'Deploy to mod.io'
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  version:
+    runs-on: ubuntu-22.04
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Extract version
+        id: version
+        run: echo "version=$(jq --raw-output '.version' package.json)" >> "$GITHUB_OUTPUT"
+
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/node-setup
+
+      - name: Build modfile
+        run: npm run build --production
+
+      - name: Save build mod
+        uses: actions/upload-artifact@v4
+        with:
+          name: item-placeholder
+          path: item-placeholder.zip
+          retention-days: 1
+
+  deploy:
+    runs-on: ubuntu-22.04
+    needs: [version, build]
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v4
+        with:
+          name: item-placeholder
+
+      - name: 'Build Changelog'
+        id: build_changelog
+        uses: mikepenz/release-changelog-builder-action@v4.1.0
+        with:
+          toTag: ${{ github.ref }}
+
+      - name: Create Release
+        id: create-release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: 'v${{ needs.version.outputs.version }}'
+          skipIfReleaseExists: true
+          artifacts: 'item-placeholder.zip'
+          artifactContentType: application/zip
+          body: ${{ steps.build_changelog.outputs.changelog }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload to modio
+        if: steps.create-release.outputs.id
+        run: |
+          curl --fail-with-body https://api.mod.io/v1/games/2869/mods/3562687/files \
+            -H "Authorization: Bearer ${{ secrets.MODIO_TOKEN }}" \
+            -F "filedata=@item-placeholder.zip" \
+            -F "version=${{ needs.version.outputs.version }}" \
+            -F "changelog=${{ steps.build_changelog.outputs.changelog }}" \
+            -F "active=true"

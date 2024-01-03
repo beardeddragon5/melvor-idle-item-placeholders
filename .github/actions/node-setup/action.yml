@@ -1,0 +1,35 @@
+name: Setup node and npm version
+description: Setup node and npm version
+runs:
+  using: 'composite'
+  steps:
+    - name: Read node version from nvmrc
+      id: nvm
+      run: echo "nvmrc=$(cat .nvmrc)" >> "$GITHUB_OUTPUT"
+      shell: bash
+
+    - name: Read wanted node versions from package.json
+      id: package
+      run: |
+        echo "node-version=$(jq --raw-output '.engines.node' package.json)" >> "$GITHUB_OUTPUT"
+        echo "npm-version=$(jq --raw-output '.engines.npm' package.json)" >> "$GITHUB_OUTPUT"
+      shell: bash
+
+    - name: Check if nvm and package.json are in sync
+      run: test "${{ steps.package.outputs.node-version }}" == "${{ steps.nvm.outputs.nvmrc }}"
+      shell: bash
+
+    - name: Setup Node
+      uses: actions/setup-node@v3
+      with:
+        node-version-file: 'package.json'
+        cache: 'npm'
+        cache-dependency-path: package-lock.json
+
+    - name: Fix npm version
+      run: npm install -g npm@${{ steps.package.outputs.npm-version }}
+      shell: bash
+
+    - name: Install Dependencies
+      run: npm ci
+      shell: bash
