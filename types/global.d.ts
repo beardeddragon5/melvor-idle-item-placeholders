@@ -24,6 +24,10 @@ declare class BankItemIcon extends HTMLElement {
   updateQuantity(bankItem: BankItem, enableAccessibility: boolean): void;
 }
 
+declare class BankSelectedItemMenu extends HTMLElement {
+  setItem(bankItem: BankItem, bank: Bank): void;
+}
+
 declare class Item {
   get id(): string;
   get localID(): string;
