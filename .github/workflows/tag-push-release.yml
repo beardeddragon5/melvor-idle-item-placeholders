@@ -1,0 +1,79 @@
+name: 'Deploy to mod.io'
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  check-version:
+    runs-on: ubuntu-22.04
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Extract version
+        id: version
+        run: echo "version=$(jq --raw-output '.version' package.json)" >> "$GITHUB_OUTPUT"
+
+      - name: Check if version is same
+        run: test "v${{ steps.version.outputs.version }}" == ${{ github.ref }}
+
+  build:
+    runs-on: ubuntu-22.04
+    needs: check-version
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/node-setup
+
+      - name: Build modfile
+        run: npm run build --production
+
+      - name: Save build mod
+        uses: actions/upload-artifact@v4
+        with:
+          name: item-placeholder
+          path: item-placeholder.zip
+          retention-days: 1
+
+  deploy:
+    runs-on: ubuntu-22.04
+    needs: [check-version, build]
+    steps:
+      - uses: actions/download-artifact@v4
+
+      - name: 'Build Changelog'
+        id: build_changelog
+        uses: mikepenz/release-changelog-builder-action@v4.1.0
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: ${{ steps.build_changelog.outputs.changelog }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./item-placeholder.zip
+          asset_name: 'item-placeholder-${{ github.ref }}.zip'
+          asset_content_type: application/zip
+
+      - uses: nickelc/upload-to-modio@v2.1.0
+        with:
+          token: ${{ secrets.MODIO_TOKEN }}
+          version: ${{ needs.check-version.outputs.version }}
+          game: 2869
+          mod: 3562687
+          changelog: ${{ steps.build_changelog.outputs.changelog }}
+          path: item-placeholder.zip
