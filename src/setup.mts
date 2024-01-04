@@ -156,12 +156,4 @@ export async function setup(ctx: ItemPlaceholderContext) {
     }
     return hasItem;
   });
-
-  ctx.patch(BankItemIcon, 'setItem').after(function (out, bank, bankItem) {
-    this.setAttribute('data-item-quantity', String(bankItem.quantity));
-  });
-
-  ctx.patch(BankItemIcon, 'updateQuantity').after(function (out, bankItem) {
-    this.setAttribute('data-item-quantity', String(bankItem.quantity));
-  });
 }

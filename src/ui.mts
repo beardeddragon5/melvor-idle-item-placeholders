@@ -60,6 +60,14 @@ export async function setupUI(ctx: ItemPlaceholderContext) {
     };
   }
 
+  ctx.patch(BankItemIcon, 'setItem').after(function (out, bank, bankItem) {
+    this.setAttribute('data-item-quantity', String(bankItem.quantity));
+  });
+
+  ctx.patch(BankItemIcon, 'updateQuantity').after(function (out, bankItem) {
+    this.setAttribute('data-item-quantity', String(bankItem.quantity));
+  });
+
   ctx.onInterfaceReady(() => {
     const selectedItem = document.querySelector('bank-selected-item-menu .row');
     const bankOptions = document.querySelector('#main-bank-options .p-3');
