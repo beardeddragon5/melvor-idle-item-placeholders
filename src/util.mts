@@ -19,11 +19,29 @@ export function isEmpty(item?: Item): boolean {
 }
 
 export function refreshAllPlaceholderStyles(itemStyle: PlaceholderStyles, emptyStyle: PlaceholderStyles) {
-  const element = document.getElementById('bank-container');
-  if (!element) {
-    console.warn('[Item Placeholder] no bank container found');
-    return;
+  {
+    const element = document.getElementById('bank-container');
+    if (!element) {
+      console.warn('[Item Placeholder] no bank container found');
+      return;
+    }
+    refreshAllPlaceholderStylesOnElement(element, itemStyle, emptyStyle);
   }
+  {
+    const element = document.getElementById('potion-select-menu-modal');
+    if (!element) {
+      console.warn('[Item Placeholder] no potion selection menu found');
+      return;
+    }
+    refreshAllPlaceholderStylesOnElement(element, itemStyle, emptyStyle);
+  }
+}
+
+export function refreshAllPlaceholderStylesOnElement(
+  element: HTMLElement,
+  itemStyle: PlaceholderStyles,
+  emptyStyle: PlaceholderStyles,
+) {
   for (const style of Object.values(PlaceholderStyles)) {
     element.classList.remove(style);
     element.classList.remove(style.replace('placeholder', 'empty'));

@@ -28,6 +28,10 @@ declare class BankSelectedItemMenu extends HTMLElement {
   setItem(bankItem: BankItem, bank: Bank): void;
 }
 
+declare class PotionSelectMenuItem extends HTMLElement {
+  setPotion(potion: Item, game: Game): void;
+}
+
 declare class Item {
   get id(): string;
   get localID(): string;
