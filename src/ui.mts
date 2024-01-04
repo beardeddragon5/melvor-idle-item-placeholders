@@ -17,6 +17,11 @@ export async function setupUI(ctx: ItemPlaceholderContext) {
   function ReleaseItem() {
     return {
       $template: '#release-item',
+      visible: false,
+
+      setVisible(visible: boolean) {
+        this.visible = visible;
+      },
 
       release() {
         releaseItem(game.bank.selectedBankItem);
@@ -68,14 +73,19 @@ export async function setupUI(ctx: ItemPlaceholderContext) {
     this.setAttribute('data-item-quantity', String(bankItem.quantity));
   });
 
+  const releaseItemUI = ReleaseItem();
+
+  ctx.patch(BankSelectedItemMenu, 'setItem').after((out, bankItem) => {
+    releaseItemUI.setVisible(bankItem?.quantity === 0);
+  });
+
   ctx.onInterfaceReady(() => {
     const selectedItem = document.querySelector('bank-selected-item-menu .row');
     const bankOptions = document.querySelector('#main-bank-options .p-3');
     if (!selectedItem || !bankOptions) {
       return;
     }
-
-    ui.create(ReleaseItem(), selectedItem);
+    ui.create(releaseItemUI, selectedItem);
     ui.create(ReleaseAll(), bankOptions);
     ui.create(CreateEmpty(), bankOptions);
 
