@@ -156,4 +156,63 @@ export async function setup(ctx: ItemPlaceholderContext) {
     }
     return hasItem;
   });
+
+  ctx.patch(Bank, 'addQuantityToExistingItems').replace(function (original, quantity) {
+    if (quantity <= 0) return;
+    for (const tabContent of this.itemsByTab) {
+      for (const bankItem of tabContent) {
+        if (bankItem.quantity > 0) {
+          this.addItem(bankItem.item, quantity, false, false, false, false);
+        }
+      }
+    }
+  });
+
+  ctx.patch(Bank, 'checkForClueChasers').replace(function (original) {
+    const count = 6;
+    if (this.itemsByTab[0].slice(0, count).every((bankItem) => bankItem.quantity > 0)) {
+      original();
+    } else {
+      // NOTE: placeholder found as one of the first items
+    }
+  });
+
+  const runIfValidItem = (onPlaceholderFound: (item: Item) => void) =>
+    function <P extends unknown[], T extends (item: Item, ...args: P) => void>(
+      this: Bank,
+      original: T,
+      item: Item,
+      ...args: P
+    ): void {
+      if (this.hasItem(item)) {
+        original(item, ...args);
+      } else if (this.items.has(item)) {
+        onPlaceholderFound(item);
+      } else {
+        // NOTE: The item is likely non existant but we want to preserve the original
+        //       error handling
+        original(item, ...args);
+      }
+    };
+
+  const runIfValidItemWithNotification = runIfValidItem(() => {
+    game.notifications.createErrorNotification(
+      'item_placeholder:is_placeholder',
+      'Action cannot be performed on placeholders',
+    );
+  });
+
+  ctx.patch(Bank, 'onItemDoubleClick').replace(runIfValidItemWithNotification);
+  ctx.patch(Bank, 'sellItemOnClick').replace(runIfValidItemWithNotification);
+  ctx.patch(Bank, 'buryItemOnClick').replace(runIfValidItemWithNotification);
+  ctx.patch(Bank, 'openItemOnClick').replace(runIfValidItemWithNotification);
+  ctx.patch(Bank, 'processItemOpen').replace(runIfValidItemWithNotification);
+  ctx.patch(Bank, 'claimItemOnClick').replace(runIfValidItemWithNotification);
+  ctx.patch(Bank, 'useEightOnClick').replace(runIfValidItemWithNotification);
+
+  ctx.patch(Bank, 'readItemOnClick').replace(
+    runIfValidItem((item) => {
+      item.showContents?.();
+    }),
+  );
 }
