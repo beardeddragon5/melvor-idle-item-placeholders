@@ -79,6 +79,10 @@ jobs:
           body: ${{ steps.build_changelog.outputs.changelog }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Create changelog temp file
+        if: steps.create-release.outputs.id
+        run: echo "${{ steps.build_changelog.outputs.changelog }}" > changelog
+
       - name: Upload to modio
         if: steps.create-release.outputs.id
         run: |
@@ -86,5 +90,5 @@ jobs:
             -H "Authorization: Bearer ${{ secrets.MODIO_TOKEN }}" \
             -F "filedata=@item-placeholder.zip" \
             -F "version=${{ needs.version.outputs.version }}" \
-            -F "changelog=${{ steps.build_changelog.outputs.changelog }}" \
+            -F "changelog=<changelog" \
             -F "active=true"
