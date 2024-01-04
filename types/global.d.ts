@@ -29,6 +29,8 @@ declare class Item {
   get localID(): string;
   get namespace(): string;
   get isModded(): boolean;
+
+  showContents?(): void;
 }
 
 declare class BankRenderQueue {
@@ -51,6 +53,17 @@ declare class Bank {
   processSellSelectedItems(): void;
   processSelectedTabSale(): void;
   processItemSale(item: Item, quantity: number): void;
+  addQuantityToExistingItems(quantity: number): void;
+
+  checkForClueChasers(): void;
+  onItemDoubleClick(item: Item): void;
+  sellItemOnClick(item: Item, quantity: number): void;
+  buryItemOnClick(item: Item, quantity: number): void;
+  openItemOnClick(item: Item, quantity: number): void;
+  processItemOpen(item: Item, quantity: number): void;
+  readItemOnClick(item: Item): void;
+  claimItemOnClick(item: Item, quantity: number): void;
+  useEightOnClick(eight: Item): void;
 
   addItem(
     item: Item,
