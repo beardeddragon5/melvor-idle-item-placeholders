@@ -91,4 +91,9 @@ export async function setupUI(ctx: ItemPlaceholderContext) {
 
     refreshAllPlaceholderStylesWithContext(ctx);
   });
+
+  ctx.patch(PotionSelectMenuItem, 'setPotion').after(function (out, potion, game) {
+    const quantity = game.bank.items.get(potion)?.quantity ?? 0;
+    this.setAttribute('data-item-quantity', String(quantity));
+  });
 }
