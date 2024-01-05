@@ -46,10 +46,10 @@ export async function setup(ctx: ItemPlaceholderContext) {
     }
   });
 
-  ctx.patch(Bank, 'removeItemQuantity').before((item, quantity, removeItemCharges) => {
-    const bankItem = game.bank.items.get(item);
+  ctx.patch(Bank, 'removeItemQuantity').before(function (item, quantity, removeItemCharges) {
+    const bankItem = this.items.get(item);
     if (!bankItem) {
-      return [item, quantity, removeItemCharges];
+      return undefined;
     } else if (bankItem.quantity === 0 && quantity === -1) {
       ctx.characterStorage.setItem(item.id, {
         tab: bankItem.tab,
@@ -65,12 +65,15 @@ export async function setup(ctx: ItemPlaceholderContext) {
         locked: bankItem.locked,
         isPlaceholder: false,
       });
-      return [item, quantity, removeItemCharges];
+      return undefined;
     }
   });
 
-  ctx.patch(Bank, 'removeItemQuantity').after((output, item) => {
-    const bankItem = game.bank.items.get(item);
+  ctx.patch(Bank, 'removeItemQuantity').after(function (output, item) {
+    const stored = ctx.characterStorage.getItem(item.id);
+    ctx.characterStorage.removeItem(item.id);
+
+    const bankItem = this.items.get(item);
     if (bankItem !== undefined) {
       return; // NOTE ignore items that are not removed
     }
@@ -80,8 +83,6 @@ export async function setup(ctx: ItemPlaceholderContext) {
       return;
     }
 
-    const stored = ctx.characterStorage.getItem(item.id);
-    ctx.characterStorage.removeItem(item.id);
     if (!stored) {
       console.warn('[Item Placeholder] unexpected item removeal of item', item.id);
       return;
@@ -91,8 +92,6 @@ export async function setup(ctx: ItemPlaceholderContext) {
     }
 
     const { tab, tabPosition, locked } = stored;
-    ctx.characterStorage.removeItem(item.id);
-
     const onlyLocked = ctx.settings.section('General').get('only-locked');
     if (onlyLocked && !locked) {
       // NOTE: only process locked items
@@ -100,40 +99,40 @@ export async function setup(ctx: ItemPlaceholderContext) {
     }
 
     if (typeof tabPosition === 'number' && tabPosition >= 0) {
-      const placeholder = new BankItem(game.bank, item, 0, tab, tabPosition);
-      game.bank.items.set(item, placeholder);
-      game.bank.itemsByTab[tab] = [
-        ...game.bank.itemsByTab[tab].slice(0, tabPosition),
+      const placeholder = new BankItem(this, item, 0, tab, tabPosition);
+      this.items.set(item, placeholder);
+      this.itemsByTab[tab] = [
+        ...this.itemsByTab[tab].slice(0, tabPosition),
         placeholder,
-        ...game.bank.itemsByTab[tab].slice(tabPosition),
+        ...this.itemsByTab[tab].slice(tabPosition),
       ];
-      game.bank.reassignBankItemPositions(tab, tabPosition);
-      game.bank.renderQueue.items.add(item);
-      game.bank.queueQuantityUpdates(item);
+      this.reassignBankItemPositions(tab, tabPosition);
+      this.renderQueue.items.add(item);
+      this.queueQuantityUpdates(item);
     }
   });
 
-  ctx.patch(Bank, 'processSelectedTabSale').replace(() => {
-    const itemsInTab = (game.bank.itemsByTab[game.bank.selectedBankTab] ?? []).map((i) => i);
+  ctx.patch(Bank, 'processSelectedTabSale').replace(function () {
+    const itemsInTab = (this.itemsByTab[this.selectedBankTab] ?? []).map((i) => i);
     for (const bankItem of itemsInTab.reverse()) {
       if (!bankItem.locked && bankItem.quantity > 0) {
-        game.bank.processItemSale(bankItem.item, bankItem.quantity);
+        this.processItemSale(bankItem.item, bankItem.quantity);
       }
     }
   });
 
-  ctx.patch(Bank, 'processSellSelectedItems').replace(() => {
-    for (const bankItem of game.bank.selectedItems) {
+  ctx.patch(Bank, 'processSellSelectedItems').replace(function () {
+    for (const bankItem of this.selectedItems) {
       if (bankItem.quantity > 0) {
-        game.bank.processItemSale(bankItem.item, bankItem.quantity);
+        this.processItemSale(bankItem.item, bankItem.quantity);
       }
     }
   });
 
-  ctx.patch(Bank, 'occupiedSlots').get((originalSlotsGetter: () => number) => {
+  ctx.patch(Bank, 'occupiedSlots').get(function (originalSlotsGetter: () => number) {
     if (ctx.settings.section('General').get('use-slots')) {
       let emptySlots = 0;
-      for (const bankItem of game.bank.items.values()) {
+      for (const bankItem of this.items.values()) {
         if (isEmpty(bankItem.item)) {
           emptySlots++;
         }
@@ -141,7 +140,7 @@ export async function setup(ctx: ItemPlaceholderContext) {
       return originalSlotsGetter() - emptySlots;
     } else {
       let placeholder = 0;
-      for (const bankItem of game.bank.items.values()) {
+      for (const bankItem of this.items.values()) {
         if (bankItem.quantity === 0) {
           placeholder++;
         }
@@ -150,9 +149,9 @@ export async function setup(ctx: ItemPlaceholderContext) {
     }
   });
 
-  ctx.patch(Bank, 'hasItem').after((hasItem: boolean, item: Item) => {
+  ctx.patch(Bank, 'hasItem').after(function (hasItem: boolean, item: Item) {
     if (hasItem) {
-      const bankItem = game.bank.items.get(item);
+      const bankItem = this.items.get(item);
       if (bankItem && bankItem.quantity === 0) {
         return false;
       }

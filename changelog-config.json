@@ -1,0 +1,20 @@
+{
+  "categories": [
+    {
+      "title": "🚀 Features",
+      "labels": ["feature"]
+    },
+    {
+      "title": "🐛 Fixes",
+      "labels": ["fix"]
+    }
+  ],
+  "ignore_labels": ["ignore"],
+  "sort": {
+    "order": "ASC",
+    "on_property": "mergedAt"
+  },
+  "template": "#{{CHANGELOG}}",
+  "pr_template": "#{{TITLE}} (PR: ##{{NUMBER}})",
+  "empty_template": "no changes"
+}
