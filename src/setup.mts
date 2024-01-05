@@ -1,8 +1,16 @@
 import type ItemPlaceholderContext from './context.mjs';
+import type { ItemMetadata } from './context.mjs';
 import type * as empty from './empty.mjs';
 import type * as settings from './settings.mjs';
 import type * as ui from './ui.mjs';
 import type * as util from './util.mjs';
+
+declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  interface Bank {
+    _itemPlaceholderRemovalData: Map<string, ItemMetadata>;
+  }
+}
 
 export async function setup(ctx: ItemPlaceholderContext) {
   const { removeEmpty, setupEmpty } = await ctx.loadModule<typeof empty>('empty.mjs');
@@ -47,11 +55,15 @@ export async function setup(ctx: ItemPlaceholderContext) {
   });
 
   ctx.patch(Bank, 'removeItemQuantity').before(function (item, quantity, removeItemCharges) {
+    if (!this._itemPlaceholderRemovalData) {
+      this._itemPlaceholderRemovalData = new Map();
+    }
+
     const bankItem = this.items.get(item);
     if (!bankItem) {
       return undefined;
     } else if (bankItem.quantity === 0 && quantity === -1) {
-      ctx.characterStorage.setItem(item.id, {
+      this._itemPlaceholderRemovalData.set(item.id, {
         tab: bankItem.tab,
         tabPosition: bankItem.tabPosition,
         locked: bankItem.locked,
@@ -59,7 +71,7 @@ export async function setup(ctx: ItemPlaceholderContext) {
       });
       return [item, 1, removeItemCharges];
     } else if (bankItem.quantity <= quantity) {
-      ctx.characterStorage.setItem(item.id, {
+      this._itemPlaceholderRemovalData.set(item.id, {
         tab: bankItem.tab,
         tabPosition: bankItem.tabPosition,
         locked: bankItem.locked,
@@ -70,8 +82,8 @@ export async function setup(ctx: ItemPlaceholderContext) {
   });
 
   ctx.patch(Bank, 'removeItemQuantity').after(function (output, item) {
-    const stored = ctx.characterStorage.getItem(item.id);
-    ctx.characterStorage.removeItem(item.id);
+    const stored = this._itemPlaceholderRemovalData.get(item.id);
+    this._itemPlaceholderRemovalData.delete(item.id);
 
     const bankItem = this.items.get(item);
     if (bankItem !== undefined) {
