@@ -15,8 +15,10 @@ export async function setup(ctx: ItemPlaceholderContext) {
   await setupUI(ctx);
 
   ctx.onCharacterLoaded(() => {
-    // NOTE: this is for the rare case that items in a tab get duplicated.
+    // NOTE: the character storage should be empty at the start
+    ctx.characterStorage.clear();
 
+    // NOTE: this is for the rare case that items in a tab get duplicated.
     let foundDuplicate = false;
     const allreadyFound = new Set();
     const newBankTabs = [];
@@ -79,6 +81,7 @@ export async function setup(ctx: ItemPlaceholderContext) {
     }
 
     const stored = ctx.characterStorage.getItem(item.id);
+    ctx.characterStorage.removeItem(item.id);
     if (!stored) {
       console.warn('[Item Placeholder] unexpected item removeal of item', item.id);
       return;
