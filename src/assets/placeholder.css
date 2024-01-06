@@ -33,10 +33,12 @@
 .placeholder-no-number-faded
   bank-item-icon[data-item-quantity='0']:not(bank-item-icon[data-item-id^='item_placeholder:empty_']) {
   opacity: 50%;
+}
 
-  & small {
-    display: none;
-  }
+.placeholder-no-number-faded
+  bank-item-icon[data-item-quantity='0']:not(bank-item-icon[data-item-id^='item_placeholder:empty_'])
+  small {
+  display: none;
 }
 
 /** Empties */
@@ -61,10 +63,10 @@
 
 .empty-no-number-faded bank-item-icon[data-item-id^='item_placeholder:empty_'] {
   opacity: 50%;
+}
 
-  & small {
-    display: none;
-  }
+.empty-no-number-faded bank-item-icon[data-item-id^='item_placeholder:empty_'] small {
+  display: none;
 }
 
 /** Potion Popup */
@@ -98,8 +100,8 @@ potion-select-menu-item[data-item-quantity='0'] button {
 
 .placeholder-no-number-faded potion-select-menu-item[data-item-quantity='0'] {
   opacity: 50%;
+}
 
-  & .mr-2 h5 {
-    display: none;
-  }
+.placeholder-no-number-faded potion-select-menu-item[data-item-quantity='0'] .mr-2 h5 {
+  display: none;
 }
