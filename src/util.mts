@@ -1,13 +1,13 @@
 import ItemPlaceholderContext from './context.mjs';
 
 export enum PlaceholderStyles {
-  None = 'placeholder-none',
-  Faded = 'placeholder-faded',
-  FadedImage = 'placeholder-faded-image',
-  Border = 'placeholder-border',
-  Number = 'placeholder-zero',
-  NoNumber = 'placeholder-no-number',
-  NoNumberFaded = 'placeholder-no-number-faded',
+  None = 'none',
+  Faded = 'faded',
+  FadedImage = 'faded-image',
+  Border = 'border',
+  Number = 'zero',
+  NoNumber = 'no-number',
+  NoNumberFaded = 'no-number-faded',
 }
 
 export function isPlaceholder(bankItem?: BankItem) {
@@ -51,15 +51,15 @@ export function refreshAllPlaceholderStylesOnElement(
   emptyStyle: PlaceholderStyles,
 ) {
   for (const style of Object.values(PlaceholderStyles)) {
-    element.classList.remove(style);
-    element.classList.remove(style.replace('placeholder', 'empty'));
+    element.classList.remove(`placeholder-${style}`);
+    element.classList.remove(`empty-${style}`);
   }
 
-  element.classList.add(itemStyle, emptyStyle.replace('placeholder', 'empty'));
+  element.classList.add(`placeholder-${itemStyle}`, `empty-${emptyStyle}`);
 }
 
 export function refreshAllPlaceholderStylesWithContext(ctx: ItemPlaceholderContext) {
-  const section = ctx.settings.section('General');
+  const section = ctx.settings.section('Interface');
   const placeholderStyle = section.get('placeholder-style');
   const emptyStyle = section.get('empty-style');
 
