@@ -31,7 +31,7 @@ export async function setupUI(ctx: ItemPlaceholderContext) {
 
   function ReleaseAll() {
     return {
-      $template: '#release-all',
+      $template: '#item-placeholder-settings',
 
       release() {
         const bankItems = game.bank.itemsByTab[game.bank.selectedBankTab];
@@ -92,11 +92,13 @@ export async function setupUI(ctx: ItemPlaceholderContext) {
   ctx.onInterfaceReady(() => {
     const selectedItem = document.querySelector('bank-selected-item-menu .row');
     const bankOptions = document.querySelector('#main-bank-options .p-3');
-    if (!selectedItem || !bankOptions) {
+    const bankSettings = document.querySelector('#bank-settings-tab');
+
+    if (!selectedItem || !bankOptions || !bankSettings) {
       return;
     }
     ui.create(releaseItemUI, selectedItem);
-    ui.create(ReleaseAll(), bankOptions);
+    ui.create(ReleaseAll(), bankSettings);
     ui.create(CreateEmpty(), bankOptions);
 
     refreshAllPlaceholderStylesWithContext(ctx);
