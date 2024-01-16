@@ -265,6 +265,27 @@ declare class BankTabMenu {
   addItemToEndofTab(bank: Bank, bankItem: BankItem): void;
 }
 
+declare class Skill {}
+
+declare class Minibar {
+  quickEquipIcons: Map<
+    Item,
+    {
+      button: HTMLElement;
+      tooltip: unknown;
+      equippedTick: HTMLElement;
+    }
+  >;
+
+  game: Game;
+
+  constructor(game: Game);
+
+  get quickEquipContainer(): HTMLElement;
+
+  createQuickEquipIcon(item: Item, skill: Skill): void;
+}
+
 declare const game: Game;
 declare const bankTabMenu: BankTabMenu;
 declare const ui: GameUI;

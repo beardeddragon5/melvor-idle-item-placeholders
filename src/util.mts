@@ -23,17 +23,25 @@ export function refreshAllPlaceholderStyles(itemStyle: PlaceholderStyles, emptyS
     const element = document.getElementById('bank-container');
     if (!element) {
       console.warn('[Item Placeholder] no bank container found');
-      return;
+    } else {
+      refreshAllPlaceholderStylesOnElement(element, itemStyle, emptyStyle);
     }
-    refreshAllPlaceholderStylesOnElement(element, itemStyle, emptyStyle);
   }
   {
     const element = document.getElementById('potion-select-menu-modal');
     if (!element) {
       console.warn('[Item Placeholder] no potion selection menu found');
-      return;
+    } else {
+      refreshAllPlaceholderStylesOnElement(element, itemStyle, emptyStyle);
     }
-    refreshAllPlaceholderStylesOnElement(element, itemStyle, emptyStyle);
+  }
+  {
+    const element = document.getElementById('skill-footer-minibar-items-container');
+    if (!element) {
+      console.warn('[Item Placeholder] no quick equip menu found');
+    } else {
+      refreshAllPlaceholderStylesOnElement(element, itemStyle, emptyStyle);
+    }
   }
 }
 
