@@ -263,6 +263,7 @@ declare class BankTabMenu {
   itemIcons: Map<Item, BankItemIcon>;
 
   addItemToEndofTab(bank: Bank, bankItem: BankItem): void;
+  selectTab(tabID: number, bank: Bank): void;
 }
 
 declare class Skill {}

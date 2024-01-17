@@ -25,6 +25,20 @@
     <div class="col-12 p-1">
       <button type="button" class="btn btn-danger btn-sm w-100" @click="release">Release All in Tab</button>
     </div>
+    <div class="col-12 p-1">
+      <div class="custom-control custom-switch">
+        <input
+          type="checkbox"
+          class="custom-control-input"
+          id="item_placeholder:disableTab"
+          @click="togglePlaceholdersOnTab()"
+          :checked="!isTabDisabled"
+        />
+        <label class="custom-control-label font-size-sm text-muted font-w400" for="item_placeholder:disableTab">
+          <small>Allow Placeholders on Tab</small>
+        </label>
+      </div>
+    </div>
   </div>
 </template>
 

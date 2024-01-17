@@ -62,9 +62,10 @@ export async function setupUI(ctx: ItemPlaceholderContext) {
     };
   }
 
-  function ReleaseAll() {
+  function BankSettings() {
     return {
       $template: '#item-placeholder-settings',
+      isTabDisabled: false,
 
       release() {
         const bankItems = game.bank.itemsByTab[game.bank.selectedBankTab];
@@ -76,6 +77,36 @@ export async function setupUI(ctx: ItemPlaceholderContext) {
             }
           }
         }
+      },
+
+      update() {
+        const disabledTabs = ctx.characterStorage.getItem('disabled-tabs') ?? [];
+        this.isTabDisabled = disabledTabs.includes(game.bank.selectedBankTab);
+        console.info(
+          '[Item placeholder] current tab = %d, disabled = %s',
+          game.bank.selectedBankTab,
+          this.isTabDisabled,
+        );
+      },
+
+      togglePlaceholdersOnTab() {
+        const disabledTabs = ctx.characterStorage.getItem('disabled-tabs') ?? [];
+        if (!disabledTabs.includes(game.bank.selectedBankTab)) {
+          disabledTabs.push(game.bank.selectedBankTab);
+          ctx.characterStorage.setItem('disabled-tabs', disabledTabs);
+          this.isTabDisabled = true;
+        } else {
+          ctx.characterStorage.setItem(
+            'disabled-tabs',
+            disabledTabs.filter((v) => v !== game.bank.selectedBankTab),
+          );
+          this.isTabDisabled = false;
+        }
+        console.info(
+          '[Item placeholder] current tab = %d, disabled = %s',
+          game.bank.selectedBankTab,
+          this.isTabDisabled,
+        );
       },
     };
   }
@@ -107,6 +138,9 @@ export async function setupUI(ctx: ItemPlaceholderContext) {
     };
   }
 
+  const releaseItemUI = ReleaseItem();
+  const settings = BankSettings();
+
   ctx.patch(BankItemIcon, 'setItem').after(function (out, bank, bankItem) {
     this.setAttribute('data-item-quantity', String(bankItem.quantity));
   });
@@ -114,8 +148,6 @@ export async function setupUI(ctx: ItemPlaceholderContext) {
   ctx.patch(BankItemIcon, 'updateQuantity').after(function (out, bankItem) {
     this.setAttribute('data-item-quantity', String(bankItem.quantity));
   });
-
-  const releaseItemUI = ReleaseItem();
 
   ctx.patch(BankSelectedItemMenu, 'setItem').after(function (out, bankItem) {
     releaseItemUI.setVisible(bankItem?.quantity === 0);
@@ -130,8 +162,10 @@ export async function setupUI(ctx: ItemPlaceholderContext) {
     if (!selectedItem || !bankOptions || !bankSettings) {
       return;
     }
+    settings.update();
+
     ui.create(releaseItemUI, selectedItem);
-    ui.create(ReleaseAll(), bankSettings);
+    ui.create(settings, bankSettings);
     ui.create(CreateEmpty(), bankOptions);
 
     refreshAllPlaceholderStylesWithContext(ctx);
@@ -155,6 +189,10 @@ export async function setupUI(ctx: ItemPlaceholderContext) {
       itemIcon.setItem(bank, bankItem);
       this.itemIcons.set(bankItem.item, itemIcon);
     }
+  });
+
+  ctx.patch(BankTabMenu, 'selectTab').after(function () {
+    settings.update();
   });
 
   ctx.patch(Minibar, 'createQuickEquipIcon').after(function (out, item) {
