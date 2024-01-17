@@ -6,6 +6,11 @@ bank-selected-item-menu[data-item-id^='item_placeholder:empty_'] .col-12:not(.co
   display: none;
 }
 
+#bank-item-box {
+  height: fit-content !important;
+  min-height: 830px;
+}
+
 /** Placeholders */
 
 .placeholder-faded bank-item-icon[data-item-quantity='0']:not(bank-item-icon[data-item-id^='item_placeholder:empty_']) {
