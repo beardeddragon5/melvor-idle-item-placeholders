@@ -9,11 +9,22 @@ export interface ItemPlaceholderSettings {
   Interface: {
     'placeholder-style': util.PlaceholderStyles;
     'empty-style': util.PlaceholderStyles;
+    'potion-style': util.PlaceholderStyles;
   };
 }
 
 export async function setupSettings(ctx: ItemPlaceholderContext) {
-  const { PlaceholderStyles, refreshAllPlaceholderStyles } = await ctx.loadModule<typeof util>('util.mjs');
+  const { PlaceholderStyles, refreshAllPlaceholderStylesWithContext } = await ctx.loadModule<typeof util>('util.mjs');
+
+  const optionDisplayName: Record<util.PlaceholderStyles, string> = {
+    [PlaceholderStyles.None]: 'Original Item',
+    [PlaceholderStyles.Faded]: 'Faded Item',
+    [PlaceholderStyles.FadedImage]: 'Faded Image',
+    [PlaceholderStyles.Border]: 'Bordered',
+    [PlaceholderStyles.Number]: 'Highlight Zero',
+    [PlaceholderStyles.NoNumber]: 'No Number',
+    [PlaceholderStyles.NoNumberFaded]: 'No Number & Faded',
+  };
 
   const generalSettings = ctx.settings.section('General');
   generalSettings.add({
@@ -40,49 +51,29 @@ export async function setupSettings(ctx: ItemPlaceholderContext) {
 
   const uiSettings = ctx.settings.section('Interface');
 
+  const onStyleChange = () => {
+    setTimeout(() => {
+      refreshAllPlaceholderStylesWithContext(ctx);
+    }, 50);
+  };
+
   uiSettings.add({
     type: 'dropdown',
     color: 'primary',
     name: 'placeholder-style',
     label: 'Placeholder Style',
     hint: 'Set how placeholders are displayed',
-    default: PlaceholderStyles.FadedImage,
+    default: PlaceholderStyles.Faded,
     options: [
-      {
-        value: PlaceholderStyles.None,
-        display: 'Original Item',
-      },
-      {
-        value: PlaceholderStyles.Faded,
-        display: 'Faded Item',
-      },
-      {
-        value: PlaceholderStyles.FadedImage,
-        display: 'Faded Item image',
-      },
-      {
-        value: PlaceholderStyles.Border,
-        display: 'Bordered item',
-      },
-      {
-        value: PlaceholderStyles.Number,
-        display: 'Emphasized number',
-      },
-      {
-        value: PlaceholderStyles.NoNumber,
-        display: 'No number',
-      },
-      {
-        value: PlaceholderStyles.NoNumberFaded,
-        display: 'No number faded',
-      },
-    ],
-    onChange(itemStyle) {
-      const emptyStyle = ctx.settings.section('Interface').get('empty-style');
-      if (itemStyle && emptyStyle) {
-        refreshAllPlaceholderStyles(itemStyle, emptyStyle);
-      }
-    },
+      PlaceholderStyles.None,
+      PlaceholderStyles.Faded,
+      PlaceholderStyles.FadedImage,
+      PlaceholderStyles.Border,
+      PlaceholderStyles.Number,
+      PlaceholderStyles.NoNumber,
+      PlaceholderStyles.NoNumberFaded,
+    ].map((value) => ({ value, display: optionDisplayName[value] })),
+    onChange: onStyleChange,
   });
 
   uiSettings.add({
@@ -91,39 +82,34 @@ export async function setupSettings(ctx: ItemPlaceholderContext) {
     name: 'empty-style',
     label: 'Empty Style',
     hint: 'Set how empties are displayed',
+    default: PlaceholderStyles.NoNumberFaded,
+    options: [
+      PlaceholderStyles.None,
+      PlaceholderStyles.Faded,
+      PlaceholderStyles.Border,
+      PlaceholderStyles.Number,
+      PlaceholderStyles.NoNumber,
+      PlaceholderStyles.NoNumberFaded,
+    ].map((value) => ({ value, display: optionDisplayName[value] })),
+    onChange: onStyleChange,
+  });
+
+  uiSettings.add({
+    type: 'dropdown',
+    color: 'primary',
+    name: 'potion-style',
+    label: 'Potion Style',
+    hint: 'Set how potions in potion selection menu are displayed',
     default: PlaceholderStyles.Faded,
     options: [
-      {
-        value: PlaceholderStyles.None,
-        display: 'Original Item',
-      },
-      {
-        value: PlaceholderStyles.Faded,
-        display: 'Faded Item',
-      },
-      {
-        value: PlaceholderStyles.Border,
-        display: 'Bordered item',
-      },
-      {
-        value: PlaceholderStyles.Number,
-        display: 'Emphasized number',
-      },
-      {
-        value: PlaceholderStyles.NoNumber,
-        display: 'No number',
-      },
-      {
-        value: PlaceholderStyles.NoNumberFaded,
-        display: 'No number faded',
-      },
-    ],
-    onChange(emptyStyle) {
-      const itemStyle = ctx.settings.section('Interface').get('placeholder-style');
-
-      if (emptyStyle && itemStyle) {
-        refreshAllPlaceholderStyles(itemStyle, emptyStyle);
-      }
-    },
+      PlaceholderStyles.None,
+      PlaceholderStyles.Faded,
+      PlaceholderStyles.FadedImage,
+      PlaceholderStyles.Border,
+      PlaceholderStyles.Number,
+      PlaceholderStyles.NoNumber,
+      PlaceholderStyles.NoNumberFaded,
+    ].map((value) => ({ value, display: optionDisplayName[value] })),
+    onChange: onStyleChange,
   });
 }
