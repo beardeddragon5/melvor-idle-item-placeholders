@@ -2,6 +2,39 @@ import type ItemPlaceholderContext from './context.mjs';
 import type * as empty from './empty.mjs';
 import type * as util from './util.mjs';
 
+const DEFAULT_ICON_WIDTH_PX = 8 + 64 + 8;
+
+export function setFixedBankWidth(items: number) {
+  const element = document.getElementById('bank-container');
+  const tabPanes = document.querySelectorAll<HTMLElement>('bank-tab-menu .tab-pane');
+
+  const bankIcon = document.querySelector('bank-item-icon');
+  const itemWidth = bankIcon
+    ? (bankIcon.computedStyleMap().get('margin-left') as CSSNumericValue).to('px').value +
+      (bankIcon.computedStyleMap().get('width') as CSSNumericValue).to('px').value +
+      (bankIcon.computedStyleMap().get('margin-right') as CSSNumericValue).to('px').value
+    : DEFAULT_ICON_WIDTH_PX;
+
+  if (!tabPanes || !element) {
+    console.error('[Item Placeholder] could not find elements for fixed bank width');
+    return;
+  }
+
+  if (items === 0) {
+    element?.classList.remove('fixed-bank-width');
+    tabPanes.forEach((tabPane) => {
+      tabPane.style.minWidth = '';
+      tabPane.style.maxWidth = '';
+    });
+  } else {
+    element?.classList.add('fixed-bank-width');
+    tabPanes.forEach((tabPane) => {
+      tabPane.style.minWidth = `${items * itemWidth}px`;
+      tabPane.style.maxWidth = `${items * itemWidth}px`;
+    });
+  }
+}
+
 export async function setupUI(ctx: ItemPlaceholderContext) {
   const { getNextEmpty } = await ctx.loadModule<typeof empty>('empty.mjs');
   const { isPlaceholder, refreshAllPlaceholderStylesWithContext } = await ctx.loadModule<typeof util>('util.mjs');
@@ -102,6 +135,7 @@ export async function setupUI(ctx: ItemPlaceholderContext) {
     ui.create(CreateEmpty(), bankOptions);
 
     refreshAllPlaceholderStylesWithContext(ctx);
+    setFixedBankWidth(ctx.settings.section('Interface').get('fixed-bank-width') ?? 0);
   });
 
   ctx.patch(PotionSelectMenuItem, 'setPotion').after(function (out, potion, game) {

@@ -164,8 +164,8 @@ interface TextConfig<K extends string> extends SettingConfig<K, string> {
 
 interface NumberConfig<K extends string> extends SettingConfig<K, number> {
   type: 'number';
-  min: number; // Minimum value to be entered
-  max: number; // Maximum value to be entered
+  min?: number; // Minimum value to be entered
+  max?: number; // Maximum value to be entered
 }
 
 interface SwitchConfig<T extends string> extends SettingConfig<T, boolean> {

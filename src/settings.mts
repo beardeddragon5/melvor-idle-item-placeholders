@@ -1,5 +1,6 @@
 import type ItemPlaceholderContext from './context.mjs';
 import type * as util from './util.mjs';
+import type * as ui from './ui.mjs';
 
 export interface ItemPlaceholderSettings {
   General: {
@@ -7,6 +8,7 @@ export interface ItemPlaceholderSettings {
     'use-slots': boolean;
   };
   Interface: {
+    'fixed-bank-width': number;
     'placeholder-style': util.PlaceholderStyles;
     'empty-style': util.PlaceholderStyles;
     'potion-style': util.PlaceholderStyles;
@@ -15,6 +17,7 @@ export interface ItemPlaceholderSettings {
 
 export async function setupSettings(ctx: ItemPlaceholderContext) {
   const { PlaceholderStyles, refreshAllPlaceholderStylesWithContext } = await ctx.loadModule<typeof util>('util.mjs');
+  const { setFixedBankWidth } = await ctx.loadModule<typeof ui>('ui.mjs');
 
   const optionDisplayName: Record<util.PlaceholderStyles, string> = {
     [PlaceholderStyles.None]: 'Original Item',
@@ -56,6 +59,18 @@ export async function setupSettings(ctx: ItemPlaceholderContext) {
       refreshAllPlaceholderStylesWithContext(ctx);
     }, 50);
   };
+
+  uiSettings.add({
+    type: 'number',
+    name: 'fixed-bank-width',
+    label: 'Items per bank row',
+    hint: 'How many items per bank row. 0 to disable this setting',
+    min: 0,
+    default: 0,
+    onChange(value) {
+      setFixedBankWidth(value);
+    },
+  });
 
   uiSettings.add({
     type: 'dropdown',
