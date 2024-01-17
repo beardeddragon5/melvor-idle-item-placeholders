@@ -5,6 +5,8 @@ export interface ItemPlaceholderSettings {
   General: {
     'only-locked': boolean;
     'use-slots': boolean;
+  };
+  Interface: {
     'placeholder-style': util.PlaceholderStyles;
     'empty-style': util.PlaceholderStyles;
   };
@@ -36,7 +38,9 @@ export async function setupSettings(ctx: ItemPlaceholderContext) {
     },
   });
 
-  generalSettings.add({
+  const uiSettings = ctx.settings.section('Interface');
+
+  uiSettings.add({
     type: 'dropdown',
     color: 'primary',
     name: 'placeholder-style',
@@ -74,14 +78,14 @@ export async function setupSettings(ctx: ItemPlaceholderContext) {
       },
     ],
     onChange(itemStyle) {
-      const emptyStyle = ctx.settings.section('General').get('empty-style');
+      const emptyStyle = ctx.settings.section('Interface').get('empty-style');
       if (itemStyle && emptyStyle) {
         refreshAllPlaceholderStyles(itemStyle, emptyStyle);
       }
     },
   });
 
-  generalSettings.add({
+  uiSettings.add({
     type: 'dropdown',
     color: 'primary',
     name: 'empty-style',
@@ -115,7 +119,7 @@ export async function setupSettings(ctx: ItemPlaceholderContext) {
       },
     ],
     onChange(emptyStyle) {
-      const itemStyle = ctx.settings.section('General').get('placeholder-style');
+      const itemStyle = ctx.settings.section('Interface').get('placeholder-style');
 
       if (emptyStyle && itemStyle) {
         refreshAllPlaceholderStyles(itemStyle, emptyStyle);
