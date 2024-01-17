@@ -2,6 +2,10 @@ bank-selected-item-menu[data-item-id^='item_placeholder:empty_'] .wiki-link {
   display: none;
 }
 
+bank-selected-item-menu[data-item-id^='item_placeholder:empty_'] .col-12:not(.col-12:last-child) {
+  display: none;
+}
+
 /** Placeholders */
 
 .placeholder-faded bank-item-icon[data-item-quantity='0']:not(bank-item-icon[data-item-id^='item_placeholder:empty_']) {
