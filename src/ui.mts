@@ -59,8 +59,17 @@ export async function setupUI(ctx: ItemPlaceholderContext) {
         if (bankItem) {
           bankItem.quantity = 0;
           game.bank.moveItemToNewTab(bankItem.tab, game.bank.selectedBankTab, bankItem.tabPosition);
-          game.bank.queueQuantityUpdates(item);
+
+          const selected = game.bank.selectedBankItem;
+          if (selected?.tab === game.bank.selectedBankTab) {
+            const updatedBankItem = game.bank.items.get(item);
+            if (updatedBankItem) {
+              game.bank.moveItemInTab(game.bank.selectedBankTab, updatedBankItem.tabPosition, selected.tabPosition + 1);
+            }
+          }
         }
+        game.bank.renderQueue.items.add(item);
+        game.bank.queueQuantityUpdates(item);
       },
     };
   }
@@ -95,5 +104,19 @@ export async function setupUI(ctx: ItemPlaceholderContext) {
   ctx.patch(PotionSelectMenuItem, 'setPotion').after(function (out, potion, game) {
     const quantity = game.bank.items.get(potion)?.quantity ?? 0;
     this.setAttribute('data-item-quantity', String(quantity));
+  });
+
+  ctx.patch(BankTabMenu, 'addItemToEndofTab').replace(function (original, bank, bankItem) {
+    if (bank.itemsByTab[bankItem.tab].length === bankItem.tabPosition + 1) {
+      original(bank, bankItem);
+    } else {
+      const itemIcon = new BankItemIcon();
+      bankTabMenu.tabs[bankItem.tab].itemContainer.insertBefore(
+        itemIcon,
+        bankTabMenu.tabs[bankItem.tab].itemContainer.childNodes[bankItem.tabPosition],
+      );
+      itemIcon.setItem(bank, bankItem);
+      this.itemIcons.set(bankItem.item, itemIcon);
+    }
   });
 }
