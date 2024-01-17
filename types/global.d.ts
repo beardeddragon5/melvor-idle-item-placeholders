@@ -256,5 +256,15 @@ declare class GameUI {
   create(vueElement: unknown, element: Element): void;
 }
 
+declare class BankTabMenu {
+  tabs: {
+    itemContainer: HTMLElement;
+  }[];
+  itemIcons: Map<Item, BankItemIcon>;
+
+  addItemToEndofTab(bank: Bank, bankItem: BankItem): void;
+}
+
 declare const game: Game;
+declare const bankTabMenu: BankTabMenu;
 declare const ui: GameUI;
