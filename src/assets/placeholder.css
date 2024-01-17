@@ -11,6 +11,10 @@ bank-selected-item-menu[data-item-id^='item_placeholder:empty_'] .col-12:not(.co
   min-height: 830px;
 }
 
+.fixed-bank-width bank-tab-menu .tab-content {
+  overflow-x: scroll;
+}
+
 /** Placeholders */
 
 .placeholder-faded bank-item-icon[data-item-quantity='0']:not(bank-item-icon[data-item-id^='item_placeholder:empty_']) {
