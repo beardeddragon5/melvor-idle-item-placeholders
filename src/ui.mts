@@ -84,8 +84,9 @@ export async function setupUI(ctx: ItemPlaceholderContext) {
 
   const releaseItemUI = ReleaseItem();
 
-  ctx.patch(BankSelectedItemMenu, 'setItem').after((out, bankItem) => {
+  ctx.patch(BankSelectedItemMenu, 'setItem').after(function (out, bankItem) {
     releaseItemUI.setVisible(bankItem?.quantity === 0);
+    this.setAttribute('data-item-id', bankItem.item.id);
   });
 
   ctx.onInterfaceReady(() => {

@@ -1,3 +1,7 @@
+bank-selected-item-menu[data-item-id^='item_placeholder:empty_'] .wiki-link {
+  display: none;
+}
+
 /** Placeholders */
 
 .placeholder-faded bank-item-icon[data-item-quantity='0']:not(bank-item-icon[data-item-id^='item_placeholder:empty_']) {
