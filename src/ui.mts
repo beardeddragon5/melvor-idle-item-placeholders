@@ -122,4 +122,12 @@ export async function setupUI(ctx: ItemPlaceholderContext) {
       this.itemIcons.set(bankItem.item, itemIcon);
     }
   });
+
+  ctx.patch(Minibar, 'createQuickEquipIcon').after(function (out, item) {
+    const icon = this.quickEquipIcons.get(item);
+    if (icon?.button) {
+      const quantity = game.bank.items.get(item)?.quantity ?? 0;
+      icon.button.setAttribute('data-item-quantity', String(quantity));
+    }
+  });
 }

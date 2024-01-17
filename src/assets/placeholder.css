@@ -118,3 +118,22 @@ potion-select-menu-item[data-item-quantity='0'] button {
 .placeholder-no-number-faded potion-select-menu-item[data-item-quantity='0'] .mr-2 h5 {
   display: none;
 }
+
+/** Quick equip */
+
+.placeholder-faded #minibar-skill-item-container button[data-item-quantity='0'] img:not(.minibar-equipped) {
+  opacity: 50%;
+}
+
+.placeholder-faded-image #minibar-skill-item-container button[data-item-quantity='0'] img:not(.minibar-equipped) {
+  opacity: 50%;
+}
+
+.placeholder-border #minibar-skill-item-container button[data-item-quantity='0'] {
+  border: 1px solid #d26a5c;
+  border-radius: 5px;
+}
+
+.placeholder-no-number-faded #minibar-skill-item-container button[data-item-quantity='0'] img:not(.minibar-equipped) {
+  opacity: 50%;
+}
