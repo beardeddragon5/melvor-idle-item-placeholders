@@ -121,6 +121,13 @@ export async function setup(ctx: ItemPlaceholderContext) {
       this.reassignBankItemPositions(tab, tabPosition);
       this.renderQueue.items.add(item);
       this.queueQuantityUpdates(item);
+
+      if (this.selectedBankItem?.item?.id === item.id) {
+        const selectedItemMenu = document.querySelector<BankSelectedItemMenu>('bank-selected-item-menu');
+        if (selectedItemMenu) {
+          selectedItemMenu.setItem(placeholder, this);
+        }
+      }
     }
   });
 
