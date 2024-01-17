@@ -12,6 +12,14 @@ export interface ItemPlaceholderAccountStorage {
   empties: string[];
 }
 
-type ItemPlaceholderContext = Context<ItemPlaceholderSettings, never, ItemPlaceholderAccountStorage>;
+export interface ItemPlaceholderCharacterStorage {
+  'disabled-tabs': number[];
+}
+
+type ItemPlaceholderContext = Context<
+  ItemPlaceholderSettings,
+  ItemPlaceholderCharacterStorage,
+  ItemPlaceholderAccountStorage
+>;
 
 export default ItemPlaceholderContext;

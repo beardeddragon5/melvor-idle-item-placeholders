@@ -110,6 +110,12 @@ export async function setup(ctx: ItemPlaceholderContext) {
       return;
     }
 
+    const disabledTabs = ctx.characterStorage.getItem('disabled-tabs') ?? [];
+    const isDisabledTab = disabledTabs.includes(game.bank.selectedBankTab);
+    if (isDisabledTab) {
+      return;
+    }
+
     if (typeof tabPosition === 'number' && tabPosition >= 0) {
       const placeholder = new BankItem(this, item, 0, tab, tabPosition);
       this.items.set(item, placeholder);
