@@ -24,7 +24,9 @@ export async function setup(ctx: ItemPlaceholderContext) {
 
   ctx.onCharacterLoaded(() => {
     // NOTE: the character storage should be empty at the start
+    const disabledTabs = ctx.characterStorage.getItem('disabled-tabs') ?? [];
     ctx.characterStorage.clear();
+    ctx.characterStorage.setItem('disabled-tabs', disabledTabs);
 
     // NOTE: this is for the rare case that items in a tab get duplicated.
     let foundDuplicate = false;
