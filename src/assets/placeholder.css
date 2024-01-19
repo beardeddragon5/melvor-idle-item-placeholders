@@ -2,10 +2,6 @@ bank-selected-item-menu[data-item-id^='item_placeholder:empty_'] .wiki-link {
   display: none;
 }
 
-bank-selected-item-menu[data-item-id^='item_placeholder:empty_'] .col-12:not(.col-12:last-child) {
-  display: none;
-}
-
 #bank-item-box {
   height: fit-content !important;
   min-height: 830px;
