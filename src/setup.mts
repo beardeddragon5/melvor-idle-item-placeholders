@@ -113,7 +113,7 @@ export async function setup(ctx: ItemPlaceholderContext) {
     }
 
     const disabledTabs = ctx.characterStorage.getItem('disabled-tabs') ?? [];
-    const isDisabledTab = disabledTabs.includes(game.bank.selectedBankTab);
+    const isDisabledTab = disabledTabs.includes(tab);
     if (isDisabledTab) {
       return;
     }
