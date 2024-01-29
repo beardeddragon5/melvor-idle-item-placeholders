@@ -118,6 +118,9 @@ export async function setupUI(ctx: ItemPlaceholderContext) {
       async createEmpty() {
         const itemID = await getNextEmpty(ctx);
         const item = game.items.getObjectByID(itemID);
+        if (!item) {
+          return;
+        }
         game.bank.addItem(item, 1, false, false, true, false);
         const bankItem = game.bank.items.get(item);
         if (bankItem) {

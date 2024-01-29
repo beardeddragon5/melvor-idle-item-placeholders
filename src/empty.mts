@@ -24,8 +24,9 @@ export async function getNextEmpty(ctx: ItemPlaceholderContext) {
   for (let i = 0; i < countEmpties; i++) {
     const emptyId = `item_placeholder:empty_i_${i}`;
     const item = game.items.getObjectByID(emptyId);
-
-    if (!game.bank.items.has(item)) {
+    if (!item) {
+      break;
+    } else if (!game.bank.items.has(item)) {
       return emptyId;
     }
   }

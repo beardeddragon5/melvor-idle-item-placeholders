@@ -206,6 +206,23 @@ export async function setup(ctx: ItemPlaceholderContext) {
     }
   });
 
+  ctx.patch(Bank, 'willItemsFit').replace(function (original, items) {
+    const useSlots = ctx.settings.section('General').get('use-slots');
+    if (useSlots) {
+      const newItems = new Set();
+      return items.every(({ item }) => {
+        if (this.items.has(item)) {
+          return true;
+        } else {
+          newItems.add(item);
+          return this.occupiedSlots + newItems.size <= this.maximumSlots;
+        }
+      });
+    } else {
+      return original(items);
+    }
+  });
+
   const runIfValidItem = (onPlaceholderFound: (item: Item) => void) =>
     function <P extends unknown[], T extends (item: Item, ...args: P) => void>(
       this: Bank,
