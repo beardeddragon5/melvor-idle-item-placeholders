@@ -1,6 +1,7 @@
 import type ItemPlaceholderContext from './context.mjs';
 import type * as empty from './empty.mjs';
 import type * as util from './util.mjs';
+import type * as modSettings from './settings.mjs';
 
 const DEFAULT_ICON_WIDTH_PX = 8 + 64 + 8;
 
@@ -38,6 +39,7 @@ export function setFixedBankWidth(items: number) {
 export async function setupUI(ctx: ItemPlaceholderContext) {
   const { getNextEmpty } = await ctx.loadModule<typeof empty>('empty.mjs');
   const { isPlaceholder, refreshAllPlaceholderStylesWithContext } = await ctx.loadModule<typeof util>('util.mjs');
+  const { CompletionLogCreation } = await ctx.loadModule<typeof modSettings>('settings.mjs');
 
   function releaseItem(bankItem?: BankItem) {
     if (isPlaceholder(bankItem)) {
@@ -216,5 +218,50 @@ export async function setupUI(ctx: ItemPlaceholderContext) {
       const quantity = game.bank.items.get(item)?.quantity ?? 0;
       icon.button.setAttribute('data-item-quantity', String(quantity));
     }
+  });
+
+  ctx.patch(ItemCompletionElement, 'updateItem').after(function (out, item, game) {
+    if (item.obtainFromItemLog) {
+      return;
+    }
+
+    this.itemImage.onclick = () => {
+      const completionLogCreation =
+        ctx.settings.section('General').get('completion-log-creation') ?? CompletionLogCreation.Disabled;
+      const onlyLocked = ctx.settings.section('General').get('only-locked') ?? false;
+      const useSlots = ctx.settings.section('General').get('use-slots') ?? false;
+
+      if (completionLogCreation === CompletionLogCreation.Disabled) {
+        return;
+      }
+
+      const found = game.stats.itemFindCount(item) > 0;
+
+      if (!found && completionLogCreation === CompletionLogCreation.OnlyFound) {
+        game.notifications.createErrorNotification(
+          `item_placeholder:only_found`,
+          'Item not found so no placeholder will be created!',
+        );
+        return;
+      } else if (game.bank.items.has(item)) {
+        game.notifications.createErrorNotification(`item_placeholder:only_found`, 'Item already in bank');
+        return;
+      } else if (useSlots && game.bank.occupiedSlots >= game.bank.maximumSlots) {
+        game.notifications.createErrorNotification(`item_placeholder:use_slots`, 'Bank is full');
+        return;
+      }
+
+      if (onlyLocked) {
+        game.bank.lockedItems.add(item);
+      }
+
+      const tab = game.bank.defaultItemTabs.get(item) ?? 0;
+      const placeholder = new BankItem(game.bank, item, 0, tab, game.bank.itemsByTab[tab].length);
+      game.bank.items.set(item, placeholder);
+      game.bank.itemsByTab[tab].push(placeholder);
+      game.bank.renderQueue.items.add(item);
+
+      game.notifications.createItemNotification(item, 0);
+    };
   });
 }

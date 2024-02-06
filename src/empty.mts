@@ -88,7 +88,9 @@ export async function setupEmpty(ctx: ItemPlaceholderContext) {
       await ctx.gameData
         .buildPackage((p) => {
           empties.map((id) => {
-            p.items.add(empty(id, 'Some big empty. Maybe use a smaller one'));
+            if (!game.items.getObjectByID(`item_placeholder:${id}`)) {
+              p.items.add(empty(id, 'Some big empty. Maybe use a smaller one'));
+            }
           });
         })
         .add();
@@ -102,7 +104,9 @@ export async function setupEmpty(ctx: ItemPlaceholderContext) {
     await ctx.gameData
       .buildPackage((p) => {
         for (let i = 0; i < countEmpties; i++) {
-          p.items.add(empty(`empty_i_${i}`, ''));
+          if (!game.items.getObjectByID(`item_placeholder:empty_i_${i}`)) {
+            p.items.add(empty(`empty_i_${i}`, ''));
+          }
         }
       })
       .add();

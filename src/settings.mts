@@ -2,10 +2,17 @@ import type ItemPlaceholderContext from './context.mjs';
 import type * as util from './util.mjs';
 import type * as ui from './ui.mjs';
 
+export enum CompletionLogCreation {
+  Disabled = 'disabled',
+  OnlyFound = 'only-found',
+  All = 'all',
+}
+
 export interface ItemPlaceholderSettings {
   General: {
     'only-locked': boolean;
     'use-slots': boolean;
+    'completion-log-creation': CompletionLogCreation;
     'create-historic': void;
     'release-everything': void;
   };
@@ -21,7 +28,7 @@ export async function setupSettings(ctx: ItemPlaceholderContext) {
   const { PlaceholderStyles, refreshAllPlaceholderStylesWithContext } = await ctx.loadModule<typeof util>('util.mjs');
   const { setFixedBankWidth } = await ctx.loadModule<typeof ui>('ui.mjs');
 
-  const optionDisplayName: Record<util.PlaceholderStyles, string> = {
+  const styleOptionDisplayName: Record<util.PlaceholderStyles, string> = {
     [PlaceholderStyles.None]: 'Original Item',
     [PlaceholderStyles.Faded]: 'Faded Item',
     [PlaceholderStyles.FadedImage]: 'Faded Image',
@@ -29,6 +36,12 @@ export async function setupSettings(ctx: ItemPlaceholderContext) {
     [PlaceholderStyles.Number]: 'Highlight Zero',
     [PlaceholderStyles.NoNumber]: 'No Number',
     [PlaceholderStyles.NoNumberFaded]: 'No Number & Faded',
+  };
+
+  const completionLogCreationOptionDisplayName: Record<CompletionLogCreation, string> = {
+    [CompletionLogCreation.Disabled]: 'Disabled',
+    [CompletionLogCreation.OnlyFound]: 'Only already found',
+    [CompletionLogCreation.All]: 'All',
   };
 
   const generalSettings = ctx.settings.section('General');
@@ -52,6 +65,18 @@ export async function setupSettings(ctx: ItemPlaceholderContext) {
         game.bank.renderQueue.items.add(item.item);
       }
     },
+  });
+
+  generalSettings.add({
+    type: 'dropdown',
+    name: 'completion-log-creation',
+    label: 'Create placeholders from the completion log',
+    hint: 'Define how and if placeholders can be created from the completion log',
+    default: CompletionLogCreation.Disabled,
+    color: 'primary',
+    options: [CompletionLogCreation.Disabled, CompletionLogCreation.OnlyFound, CompletionLogCreation.All].map(
+      (value) => ({ value, display: completionLogCreationOptionDisplayName[value] }),
+    ),
   });
 
   generalSettings.add({
@@ -171,7 +196,7 @@ export async function setupSettings(ctx: ItemPlaceholderContext) {
       PlaceholderStyles.Number,
       PlaceholderStyles.NoNumber,
       PlaceholderStyles.NoNumberFaded,
-    ].map((value) => ({ value, display: optionDisplayName[value] })),
+    ].map((value) => ({ value, display: styleOptionDisplayName[value] })),
     onChange: onStyleChange,
   });
 
@@ -189,7 +214,7 @@ export async function setupSettings(ctx: ItemPlaceholderContext) {
       PlaceholderStyles.Number,
       PlaceholderStyles.NoNumber,
       PlaceholderStyles.NoNumberFaded,
-    ].map((value) => ({ value, display: optionDisplayName[value] })),
+    ].map((value) => ({ value, display: styleOptionDisplayName[value] })),
     onChange: onStyleChange,
   });
 
@@ -208,7 +233,7 @@ export async function setupSettings(ctx: ItemPlaceholderContext) {
       PlaceholderStyles.Number,
       PlaceholderStyles.NoNumber,
       PlaceholderStyles.NoNumberFaded,
-    ].map((value) => ({ value, display: optionDisplayName[value] })),
+    ].map((value) => ({ value, display: styleOptionDisplayName[value] })),
     onChange: onStyleChange,
   });
 }
