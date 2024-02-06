@@ -363,6 +363,7 @@ declare class UnregisteredConstructionError extends Error {
 
 declare class Notifications {
   createErrorNotification(customID: string, msg: string): void;
+  createItemNotification(item: Item, quantity: number): void;
 }
 
 declare class GameStats {
@@ -557,6 +558,16 @@ declare class Minibar {
   get quickEquipContainer(): HTMLElement;
 
   createQuickEquipIcon(item: Item, skill: Skill): void;
+}
+
+declare class ItemCompletionElement extends HTMLElement {
+  itemImage: HTMLImageElement;
+
+  constructor();
+  connectedCallback(): void;
+  disconnectedCallback(): void;
+  updateItem(item: Item, game: Game): void;
+  getItemTooltipHTML(item: Item, game: Game): string;
 }
 
 declare interface ModalConfig {
