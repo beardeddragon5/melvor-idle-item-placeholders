@@ -67,13 +67,25 @@ export async function setupUI(ctx: ItemPlaceholderContext) {
       $template: '#item-placeholder-settings',
       isTabDisabled: false,
 
-      release() {
-        const bankItems = game.bank.itemsByTab[game.bank.selectedBankTab];
-        if (bankItems) {
-          const copy = bankItems.map((i) => i);
-          for (const bankItem of copy.reverse()) {
-            if (isPlaceholder(bankItem)) {
-              releaseItem(bankItem);
+      async release() {
+        const result = await SwalLocale.fire({
+          title: 'Release all placeholders and empties in Tab?',
+          html: `
+            <h5 class="font-w400 text-combat-smoke font-size-sm mb-2">Are you sure you want to release all placeholders and empties in the Tab?</h5>
+            <h5 class="font-w600 text-danger font-size-sm mb-1">${getLangString('MENU_TEXT_CANNOT_UNDO')}</h5>
+          `,
+          icon: 'warning',
+          showCancelButton: true,
+        });
+
+        if (result.value) {
+          const bankItems = game.bank.itemsByTab[game.bank.selectedBankTab];
+          if (bankItems) {
+            const copy = bankItems.map((i) => i);
+            for (const bankItem of copy.reverse()) {
+              if (isPlaceholder(bankItem)) {
+                releaseItem(bankItem);
+              }
             }
           }
         }

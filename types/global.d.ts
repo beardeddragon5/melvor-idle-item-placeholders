@@ -554,6 +554,26 @@ declare class Minibar {
   createQuickEquipIcon(item: Item, skill: Skill): void;
 }
 
+declare interface ModalConfig {
+  title: string;
+  html: string;
+  showCancelButton?: boolean;
+  icon: string;
+}
+
+declare interface ModalResult {
+  isConfirmed: boolean;
+  isDenied: boolean;
+  isDismissed: boolean;
+  value: boolean;
+}
+
+declare class SwalLocale {
+  static fire(config: ModalConfig): Promise<ModalResult>;
+}
+
 declare const game: Game;
 declare const bankTabMenu: BankTabMenu;
 declare const ui: GameUI;
+
+declare function getLangString(key: string): string;

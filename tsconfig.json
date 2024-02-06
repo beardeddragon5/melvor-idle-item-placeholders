@@ -6,9 +6,9 @@
     "allowJs": true,
     "strict": true,
     "strictNullChecks": true,
-    "typeRoots": [],
-    "outDir": "dist"
+    "typeRoots": ["types"],
+    "outDir": "dist",
   },
   "include": ["src/**/*", "types"],
-  "exclude": ["**/*.spec.ts"]
+  "exclude": ["**/*.spec.ts"],
 }
