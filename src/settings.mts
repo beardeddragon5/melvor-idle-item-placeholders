@@ -6,6 +6,7 @@ export interface ItemPlaceholderSettings {
   General: {
     'only-locked': boolean;
     'use-slots': boolean;
+    'create-historic': void;
   };
   Interface: {
     'fixed-bank-width': number;
@@ -48,6 +49,55 @@ export async function setupSettings(ctx: ItemPlaceholderContext) {
       const item = game.bank.itemsByTab[0][0];
       if (item) {
         game.bank.renderQueue.items.add(item.item);
+      }
+    },
+  });
+
+  generalSettings.add({
+    type: 'button',
+    name: 'create-historic',
+    color: 'warning',
+    label: 'Recreate historic Placeholders',
+    hint: 'Creates placeholders for items no longer in the bank, but previously owned',
+    display: 'Create historic placeholders',
+    async onClick() {
+      const result = await SwalLocale.fire({
+        title: 'Create historic placeholders?',
+        html: `
+          <h5 class="font-w400 text-combat-smoke font-size-sm mb-2">
+            Are you sure you want to create all historic placeholders in the Bank?  <br/>
+            This respects your settings for disabled tabs, locked items (will lock new placeholders) and usage of slots
+          </h5>
+          <h5 class="font-w600 text-danger font-size-sm mb-1">${getLangString('MENU_TEXT_CANNOT_UNDO')}</h5>
+        `,
+        icon: 'warning',
+        showCancelButton: true,
+      });
+
+      if (result.value) {
+        const disabledTabs = ctx.characterStorage.getItem('disabled-tabs') ?? [];
+        const onlyLocked = ctx.settings.section('General').get('only-locked') ?? false;
+        const useSlots = ctx.settings.section('General').get('use-slots') ?? false;
+
+        for (const item of game.items.filter(
+          (item) => game.stats.itemFindCount(item) > 0 && !game.bank.items.has(item),
+        )) {
+          const tab = game.bank.getItemDefaultTab(item);
+          if (disabledTabs.includes(tab)) {
+            continue;
+          } else if (useSlots && game.bank.occupiedSlots >= game.bank.maximumSlots) {
+            return;
+          }
+
+          if (onlyLocked) {
+            game.bank.lockedItems.add(item);
+          }
+
+          const placeholder = new BankItem(game.bank, item, 0, tab, game.bank.itemsByTab[tab].length);
+          game.bank.items.set(item, placeholder);
+          game.bank.itemsByTab[tab].push(placeholder);
+          game.bank.renderQueue.items.add(item);
+        }
       }
     },
   });

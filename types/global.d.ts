@@ -365,10 +365,15 @@ declare class Notifications {
   createErrorNotification(customID: string, msg: string): void;
 }
 
+declare class GameStats {
+  itemFindCount(item: Item): number;
+}
+
 declare class Game {
   bank: Bank;
   items: ItemRegistry;
   notifications: Notifications;
+  stats: GameStats;
 }
 
 declare class ModStorage<T> {
