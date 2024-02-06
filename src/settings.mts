@@ -7,6 +7,7 @@ export interface ItemPlaceholderSettings {
     'only-locked': boolean;
     'use-slots': boolean;
     'create-historic': void;
+    'release-everything': void;
   };
   Interface: {
     'fixed-bank-width': number;
@@ -97,6 +98,39 @@ export async function setupSettings(ctx: ItemPlaceholderContext) {
           game.bank.items.set(item, placeholder);
           game.bank.itemsByTab[tab].push(placeholder);
           game.bank.renderQueue.items.add(item);
+        }
+      }
+    },
+  });
+
+  generalSettings.add({
+    type: 'button',
+    name: 'release-everything',
+    color: 'danger',
+    label: 'Remove ALL placeholders and empties',
+    hint: 'This will remove all placeholders and empties in the Bank',
+    display: 'Remove everything',
+    async onClick() {
+      const result = await SwalLocale.fire({
+        title: 'Remove ALL placeholders and empties?',
+        html: `
+          <h5 class="font-w400 text-combat-smoke font-size-sm mb-2">
+            Are you sure you want to remove all placeholders and empties in the Bank?
+          </h5>
+          <h5 class="font-w600 text-danger font-size-sm mb-1">${getLangString('MENU_TEXT_CANNOT_UNDO')}</h5>
+        `,
+        icon: 'warning',
+        showCancelButton: true,
+      });
+
+      if (result.value) {
+        for (const tabContent of game.bank.itemsByTab) {
+          const copy = tabContent.map((i) => i);
+          for (const bankItem of copy.reverse()) {
+            if (bankItem.quantity === 0) {
+              game.bank.removeItemQuantity(bankItem.item, -1);
+            }
+          }
         }
       }
     },
