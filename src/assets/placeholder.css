@@ -119,6 +119,10 @@ potion-select-menu-item[data-item-quantity='0'] button {
   display: none;
 }
 
+.potion-no-display potion-select-menu-item[data-item-quantity='0'] {
+  display: none;
+}
+
 /** Quick equip */
 
 .placeholder-faded #minibar-skill-item-container button[data-item-quantity='0'] img:not(.minibar-equipped) {

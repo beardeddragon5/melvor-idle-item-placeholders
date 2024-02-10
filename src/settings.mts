@@ -36,6 +36,7 @@ export async function setupSettings(ctx: ItemPlaceholderContext) {
     [PlaceholderStyles.Number]: 'Highlight Zero',
     [PlaceholderStyles.NoNumber]: 'No Number',
     [PlaceholderStyles.NoNumberFaded]: 'No Number & Faded',
+    [PlaceholderStyles.NoDisplay]: 'No Display',
   };
 
   const completionLogCreationOptionDisplayName: Record<CompletionLogCreation, string> = {
@@ -233,6 +234,7 @@ export async function setupSettings(ctx: ItemPlaceholderContext) {
       PlaceholderStyles.Number,
       PlaceholderStyles.NoNumber,
       PlaceholderStyles.NoNumberFaded,
+      PlaceholderStyles.NoDisplay,
     ].map((value) => ({ value, display: styleOptionDisplayName[value] })),
     onChange: onStyleChange,
   });
