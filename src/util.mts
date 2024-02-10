@@ -8,6 +8,7 @@ export enum PlaceholderStyles {
   Number = 'zero',
   NoNumber = 'no-number',
   NoNumberFaded = 'no-number-faded',
+  NoDisplay = 'no-display',
 }
 
 export function isPlaceholder(bankItem?: BankItem) {
