@@ -324,16 +324,16 @@ declare class BankItem {
 }
 // #endregion
 
-declare class BankItemIcon extends HTMLElement {
+declare class BankItemIconElement extends HTMLElement {
   setItem(bank: Bank, bankItem: BankItem): void;
   updateQuantity(bankItem: BankItem, enableAccessibility: boolean): void;
 }
 
-declare class BankSelectedItemMenu extends HTMLElement {
+declare class BankSelectedItemMenuElement extends HTMLElement {
   setItem(bankItem: BankItem, bank: Bank): void;
 }
 
-declare class PotionSelectMenuItem extends HTMLElement {
+declare class PotionSelectMenuItemElement extends HTMLElement {
   setPotion(potion: Item, game: Game): void;
 }
 
@@ -529,11 +529,11 @@ declare class GameUI {
   create(vueElement: unknown, element: Element): void;
 }
 
-declare class BankTabMenu {
+declare class BankTabMenuElement {
   tabs: {
     itemContainer: HTMLElement;
   }[];
-  itemIcons: Map<Item, BankItemIcon>;
+  itemIcons: Map<Item, BankItemIconElement>;
 
   addItemToEndofTab(bank: Bank, bankItem: BankItem): void;
   selectTab(tabID: number, bank: Bank): void;
@@ -589,7 +589,7 @@ declare class SwalLocale {
 }
 
 declare const game: Game;
-declare const bankTabMenu: BankTabMenu;
+declare const bankTabMenu: BankTabMenuElement;
 declare const ui: GameUI;
 
 declare function getLangString(key: string): string;

@@ -131,7 +131,7 @@ export async function setup(ctx: ItemPlaceholderContext) {
       this.queueQuantityUpdates(item);
 
       if (this.selectedBankItem?.item?.id === item.id) {
-        const selectedItemMenu = document.querySelector<BankSelectedItemMenu>('bank-selected-item-menu');
+        const selectedItemMenu = document.querySelector<BankSelectedItemMenuElement>('bank-selected-item-menu');
         if (selectedItemMenu) {
           selectedItemMenu.setItem(placeholder, this);
         }
