@@ -5,16 +5,32 @@ import type * as modSettings from './settings.mjs';
 
 const DEFAULT_ICON_WIDTH_PX = 8 + 64 + 8;
 
+export function calcElementWidth(element: Element | Omit<Element, 'computedStyleMap'> | null): number | undefined {
+  if (element && 'computedStyleMap' in element) {
+    return (
+      (element.computedStyleMap().get('margin-left') as CSSNumericValue).to('px').value +
+      (element.computedStyleMap().get('width') as CSSNumericValue).to('px').value +
+      (element.computedStyleMap().get('margin-right') as CSSNumericValue).to('px').value
+    );
+  } else if (element) {
+    const iconRect = element.getBoundingClientRect();
+    const parentRect = element.parentElement?.getBoundingClientRect();
+    if (parentRect) {
+      return iconRect.width + (iconRect.x - parentRect.x) * 2;
+    } else {
+      return undefined;
+    }
+  } else {
+    return undefined;
+  }
+}
+
 export function setFixedBankWidth(items: number) {
   const element = document.getElementById('bank-container');
   const tabPanes = document.querySelectorAll<HTMLElement>('bank-tab-menu .tab-pane');
-
   const bankIcon = document.querySelector('bank-item-icon');
-  const itemWidth = bankIcon
-    ? (bankIcon.computedStyleMap().get('margin-left') as CSSNumericValue).to('px').value +
-      (bankIcon.computedStyleMap().get('width') as CSSNumericValue).to('px').value +
-      (bankIcon.computedStyleMap().get('margin-right') as CSSNumericValue).to('px').value
-    : DEFAULT_ICON_WIDTH_PX;
+
+  const itemWidth = calcElementWidth(bankIcon) ?? DEFAULT_ICON_WIDTH_PX;
 
   if (!tabPanes || !element) {
     console.error('[Item Placeholder] could not find elements for fixed bank width');
@@ -158,15 +174,15 @@ export async function setupUI(ctx: ItemPlaceholderContext) {
   const releaseItemUI = ReleaseItem();
   const settings = BankSettings();
 
-  ctx.patch(BankItemIcon, 'setItem').after(function (out, bank, bankItem) {
+  ctx.patch(BankItemIconElement, 'setItem').after(function (out, bank, bankItem) {
     this.setAttribute('data-item-quantity', String(bankItem.quantity));
   });
 
-  ctx.patch(BankItemIcon, 'updateQuantity').after(function (out, bankItem) {
+  ctx.patch(BankItemIconElement, 'updateQuantity').after(function (out, bankItem) {
     this.setAttribute('data-item-quantity', String(bankItem.quantity));
   });
 
-  ctx.patch(BankSelectedItemMenu, 'setItem').after(function (out, bankItem) {
+  ctx.patch(BankSelectedItemMenuElement, 'setItem').after(function (out, bankItem) {
     releaseItemUI.setVisible(bankItem?.quantity === 0);
     this.setAttribute('data-item-id', bankItem.item.id);
   });
@@ -189,16 +205,16 @@ export async function setupUI(ctx: ItemPlaceholderContext) {
     setFixedBankWidth(ctx.settings.section('Interface').get('fixed-bank-width') ?? 0);
   });
 
-  ctx.patch(PotionSelectMenuItem, 'setPotion').after(function (out, potion, game) {
+  ctx.patch(PotionSelectMenuItemElement, 'setPotion').after(function (out, potion, game) {
     const quantity = game.bank.items.get(potion)?.quantity ?? 0;
     this.setAttribute('data-item-quantity', String(quantity));
   });
 
-  ctx.patch(BankTabMenu, 'addItemToEndofTab').replace(function (original, bank, bankItem) {
+  ctx.patch(BankTabMenuElement, 'addItemToEndofTab').replace(function (original, bank, bankItem) {
     if (bank.itemsByTab[bankItem.tab].length === bankItem.tabPosition + 1) {
       original(bank, bankItem);
     } else {
-      const itemIcon = new BankItemIcon();
+      const itemIcon = new BankItemIconElement();
       bankTabMenu.tabs[bankItem.tab].itemContainer.insertBefore(
         itemIcon,
         bankTabMenu.tabs[bankItem.tab].itemContainer.childNodes[bankItem.tabPosition],
@@ -208,7 +224,7 @@ export async function setupUI(ctx: ItemPlaceholderContext) {
     }
   });
 
-  ctx.patch(BankTabMenu, 'selectTab').after(function () {
+  ctx.patch(BankTabMenuElement, 'selectTab').after(function () {
     settings.update();
   });
 
